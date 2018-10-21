@@ -3,6 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import axios from "axios";
 import ImageUploader from "react-images-upload";
+const download = require("image-downloader");
 
 export default class App extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ export default class App extends Component {
       file: null,
       error: " ",
       pictures: [],
+      url: "",
       image_id: ""
     };
     this.onDrop = this.onDrop.bind(this);
@@ -25,24 +27,52 @@ export default class App extends Component {
 
   onSubmit(e) {
     e.preventDefault();
+    const that = this;
     console.log(this.state);
     const formData = new FormData();
     formData.append("file", this.state.pictures[0]);
-    formData.append("upload_preset", "bdfdunoz");
+    formData.append(
+      "upload_preset",
+      process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+    );
 
     axios
-      .post("https://api.cloudinary.com/v1_1/oluwaseun/image/upload/", formData)
+      .post(
+        `https://api.cloudinary.com/v1_1/${
+          process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
+        }/image/upload/`,
+        formData
+      )
       .then(function(response) {
         console.log(response.data.public_id);
-        let id = response.data.public_id;
         axios
           .get(
-            "https://res.cloudinary.com/oluwaseun/image/upload/l_" +
-              id +
-              "/mr1gjrqf5ffdwxuqzsuy.png"
+            `https://res.cloudinary.com/oluwaseun/image/upload/l_${
+              response.data.public_id
+            }/${process.env.REACT_APP_CLOUDINARY_IMAGE_OVERLAY}`
           )
           .then(function(response) {
             console.log(response);
+            console.log(response.config.url);
+            that.setState({ url: response.data });
+            var link = document.createElement("a");
+            link.href = response.config.url;
+            link.download = "Download.jpg";
+            document.body.appendChild(link);
+            link.click();
+            // const options = {
+            //   url: response.config.url,
+            //   dest: "/path/to/dest" // Save to /path/to/dest/image.jpg
+            // };
+
+            // download
+            //   .image(options)
+            //   .then(({ filename, image }) => {
+            //     console.log("File saved to", filename);
+            //   })
+            //   .catch(err => {
+            //     console.error(err);
+            //   });
           })
           .catch(function(err) {
             console.log(err);
@@ -68,7 +98,8 @@ export default class App extends Component {
         {}
       )
       .then(function(response) {
-        console.log(response);
+        console.log(response.config.url);
+        console.log(response.data);
       })
       .catch(function(err) {
         console.log(err);
@@ -90,6 +121,11 @@ export default class App extends Component {
           />
           <input type="submit" />
         </form>
+        <p>jfdjfsdbjf</p>
+        <a href={this.state.url} download>
+          {" "}
+          Download
+        </a>
       </div>
     );
   }

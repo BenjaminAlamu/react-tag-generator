@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import axios from "axios";
 import ImageUploader from "react-images-upload";
-const download = require("image-downloader");
+import FileSaver from "file-saver";
 
 export default class App extends Component {
   constructor(props) {
@@ -55,51 +55,12 @@ export default class App extends Component {
             console.log(response);
             console.log(response.config.url);
             that.setState({ url: response.data });
-            var link = document.createElement("a");
-            link.href = response.config.url;
-            link.download = "Download.jpg";
-            document.body.appendChild(link);
-            link.click();
-            // const options = {
-            //   url: response.config.url,
-            //   dest: "/path/to/dest" // Save to /path/to/dest/image.jpg
-            // };
-
-            // download
-            //   .image(options)
-            //   .then(({ filename, image }) => {
-            //     console.log("File saved to", filename);
-            //   })
-            //   .catch(err => {
-            //     console.error(err);
-            //   });
+            FileSaver.saveAs(response.config.url, "image.png");
           })
           .catch(function(err) {
             console.log(err);
           });
         console.log("Here");
-      })
-      .catch(function(err) {
-        console.log(err);
-      });
-    console.log("Here");
-  }
-
-  overlayImage(e, id) {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("file", this.state.pictures[0]);
-    formData.append("upload_preset", "bdfdunoz");
-    axios
-      .post(
-        "https://api.cloudinary.com/v1_1/oluwaseun/image/upload/l" +
-          id +
-          "/customcreative1.jpg",
-        {}
-      )
-      .then(function(response) {
-        console.log(response.config.url);
-        console.log(response.data);
       })
       .catch(function(err) {
         console.log(err);

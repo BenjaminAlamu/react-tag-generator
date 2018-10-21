@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
+    "base64-img": "^1.0.4",
+    "image-downloader": "^3.4.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-images-upload": "^1.2.3",

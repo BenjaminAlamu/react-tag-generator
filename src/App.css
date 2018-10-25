@@ -18,6 +18,21 @@
   color: white;
 }
 
+.row {
+  margin: auto;
+}
+
+input[type='text'] {
+  outline: 0;
+  background: transparent;
+  font-size: 12px;
+  height: auto;
+  margin: auto;
+  width: 60%;
+  font-family: "Montserrat";
+  display: block;
+}
+
 .App-link {
   color: #61dafb;
 }

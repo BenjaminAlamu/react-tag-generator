@@ -21,13 +21,13 @@ export default class App extends Component {
   }
 
   onDrop(picture) {
-    this.setState({ pictures: this.state.pictures.concat(picture) });
+    this.setState({ pictures: picture });
     console.log(this.state);
   }
 
   onSubmit(e) {
     e.preventDefault();
-    const that = this;
+    const self = this;
     console.log(this.state);
     const formData = new FormData();
     formData.append("file", this.state.pictures[0]);
@@ -36,33 +36,39 @@ export default class App extends Component {
       process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
     );
 
+    //Upload Image
     axios
       .post(
         `https://api.cloudinary.com/v1_1/${
-          process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
+        process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
         }/image/upload/`,
         formData
       )
-      .then(function(response) {
+      .then(function (response) {
         console.log(response.data.public_id);
-        axios
-          .get(
-            `https://res.cloudinary.com/oluwaseun/image/upload/l_${
-              response.data.public_id
-            }/${process.env.REACT_APP_CLOUDINARY_IMAGE_OVERLAY}`
-          )
-          .then(function(response) {
-            console.log(response);
-            console.log(response.config.url);
-            that.setState({ url: response.data });
-            FileSaver.saveAs(response.config.url, "image.png");
-          })
-          .catch(function(err) {
-            console.log(err);
-          });
-        console.log("Here");
+        self.addOverlay(response);
       })
-      .catch(function(err) {
+      .catch(function (err) {
+        console.log(err);
+      });
+    console.log("Here");
+  }
+
+  addOverlay(response) {
+    const self = this;
+    axios
+      .get(
+        `https://res.cloudinary.com/oluwaseun/image/upload/l_${
+        response.data.public_id
+        },r_max,w_400,h_400,x_34,y_34/c_crop,g_face/l_text:Arial_24:Benjamin Alamu,x_315,y_140/testdp.jpg`
+      )
+      .then(function (response) {
+        console.log(response);
+        console.log(response.config.url);
+        self.setState({ url: response.data });
+        FileSaver.saveAs(response.config.url, "image.jpg");
+      })
+      .catch(function (err) {
         console.log(err);
       });
     console.log("Here");
@@ -73,20 +79,17 @@ export default class App extends Component {
       <div className="App">
         <form onSubmit={this.onSubmit}>
           <ImageUploader
-            withIcon={true}
+            buttonText="Select image"
             withPreview={true}
-            buttonText="Choose images"
             onChange={this.onDrop}
-            imgExtension={[".jpg", ".gif", ".png", ".gif"]}
+            fileTypeError="File format not supported. Please select a png or jpg image"
+            fileSizeError="Image size is too large"
+            imgExtension={[".jpg", ".png",]}
             maxFileSize={5242880}
+            singleImage={true}
           />
           <input type="submit" />
         </form>
-        <p>jfdjfsdbjf</p>
-        <a href={this.state.url} download>
-          {" "}
-          Download
-        </a>
       </div>
     );
   }

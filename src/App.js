@@ -95,7 +95,7 @@ class App extends Component {
         console.log(response);
         console.log(response.config.url);
         self.setState({ url: response.data });
-        FileSaver.saveAs(response.config.url, `${self.state.name}.png`);
+        FileSaver.saveAs(response.config.url, `${self.state.name}.jpg`);
         self.setState({ loading: false });
       })
       .catch(function (err) {

@@ -25,16 +25,13 @@ function App() {
   // handle picture drop
   const handleImageDrop = (picture) => {
     setPageState({ ...state, pictures: picture })
-    console.log(state)
   }
 
-  console.log(state)
   // handle submit
   const handleSubmit = (e) => {
     e.preventDefault()
     const { name, pictures } = state
     setPageState({ ...state, loading: true })
-    console.log(pictures, name)
     if (name.length > 0 && pictures.length > 0) {
       const formData = new FormData()
       formData.append('file', pictures[0])
@@ -42,21 +39,18 @@ function App() {
         'upload_preset',
         process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
       )
-      console.log(
-        process.env.REACT_APP_CLOUDINARY_CLOUD_NAME,
-        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
-      )
+
       //  Upload Image
       axios
         .post(
           `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`,
           formData
         )
-        .then(function (response) {
+        .then((response) => {
           console.log(response.data.public_id)
           addOverlay(response)
         })
-        .catch(function (err) {
+        .catch((err) => {
           console.log(err)
           setPageState({ ...state, loading: false })
           setPageState({ ...state, error: 'An error occured please try again' })
@@ -84,7 +78,7 @@ function App() {
         FileSaver.saveAs(response.config.url, `${name}.jpg`)
         setPageState({ ...state, loading: false })
       })
-      .catch(function (err) {
+      .catch((err) => {
         console.log(err)
         setPageState({ ...state, loading: false })
         setPageState({ ...state, error: 'An error occured please try again' })

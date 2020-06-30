@@ -5,7 +5,7 @@ import axios from 'axios'
 import ImageUploader from 'react-images-upload'
 import FileSaver from 'file-saver'
 
-function App() {
+function App () {
   const [state, setPageState] = useState({
     text: '',
     file: null,
@@ -14,32 +14,38 @@ function App() {
     url: '',
     image_id: '',
     name: '',
-    loading: false,
+    loading: false
   })
 
   // handle change in name value
   const handleChange = (event) => {
-    setPageState({ name: event.target.value })
+    setPageState({ ...state, name: event.target.value })
   }
 
   // handle picture drop
-  const handleDrop = (picture) => {
-    setPageState({ pictures: picture })
+  const handleImageDrop = (picture) => {
+    setPageState({ ...state, pictures: picture })
     console.log(state)
   }
 
+  console.log(state)
   // handle submit
   const handleSubmit = (e) => {
     e.preventDefault()
-    setPageState({ loading: true })
-    if (state.name.length > 0 && state.pictures.length > 0) {
+    const { name, pictures } = state
+    setPageState({ ...state, loading: true })
+    console.log(pictures, name)
+    if (name.length > 0 && pictures.length > 0) {
       const formData = new FormData()
-      formData.append('file', state.pictures[0])
+      formData.append('file', pictures[0])
       formData.append(
         'upload_preset',
         process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
       )
-
+      console.log(
+        process.env.REACT_APP_CLOUDINARY_CLOUD_NAME,
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+      )
       //  Upload Image
       axios
         .post(
@@ -52,42 +58,49 @@ function App() {
         })
         .catch(function (err) {
           console.log(err)
-          setPageState({ loading: false })
-          setPageState({ error: 'An error occured please try again' })
+          setPageState({ ...state, loading: false })
+          setPageState({ ...state, error: 'An error occured please try again' })
         })
-    } else if (!state.pictures.length > 0) {
-      setPageState({ error: 'Please select an image' })
-      setPageState({ loading: false })
-    } else if (!state.name.length > 0) {
-      setPageState({ error: 'Please enter your name' })
-      setPageState({ loading: false })
+    } else if (!pictures.length > 0) {
+      setPageState({ ...state, error: 'Please select an image' })
+      setPageState({ ...state, loading: false })
+    } else if (name.length < 0) {
+      setPageState({ ...state, error: 'Please enter your name' })
+      setPageState({ ...state, loading: false })
     }
   }
 
   // Add overlay to image
   const addOverlay = (response) => {
+    const { name } = state
     axios
       .get(
-        `https://res.cloudinary.com/oluwaseun/image/upload/l_${response.data.public_id},r_max,w_400,h_400,x_34,y_34/c_crop,g_face/l_text:Arial_24:${state.name},x_315,y_140/testdp.jpg`
+        `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/l_${response.data.public_id},r_max,w_400,h_400,x_34,y_34/c_crop,g_face/l_text:Arial_24:${name},x_315,y_140/testdp.jpg`
       )
       .then((response) => {
         console.log(response)
         console.log(response.config.url)
         setPageState({ url: response.data })
-        FileSaver.saveAs(response.config.url, `${state.name}.jpg`)
-        setPageState({ loading: false })
+        FileSaver.saveAs(response.config.url, `${name}.jpg`)
+        setPageState({ ...state, loading: false })
       })
       .catch(function (err) {
         console.log(err)
-        setPageState({ loading: false })
-        setPageState({ error: 'An error occured please try again' })
+        setPageState({ ...state, loading: false })
+        setPageState({ ...state, error: 'An error occured please try again' })
       })
   }
-  const loading = state.loading
+  const { name, error, loading } = state
   let load
   loading
     ? (load = (
-      <Loader type='ThreeDots' color='#00BFFF' height='100' width='100' />
+      <Loader
+        type='ThreeDots'
+        color='#00BFFF'
+        height='100'
+        width='100'
+        className='loader'
+      />
     ))
     : (load = '')
   return (
@@ -100,20 +113,20 @@ function App() {
               withPreview
               withIcon
               fileContainerStyle={{ width: 70 + '%' }}
-              onChange={handleDrop}
+              onChange={handleImageDrop}
               fileTypeError='File format not supported. Please select a png or jpg image'
               fileSizeError='Image size is too large'
               imgExtension={['.jpg', '.png', 'jpeg']}
               maxFileSize={5242880}
               singleImage
             />
-            {state.error}
+            {error}
             <br />
             <div className='form-group'>
               <input
                 type='text'
                 className='form-control'
-                value={state.name}
+                value={name}
                 placeholder='Enter name here'
                 onChange={handleChange}
               />

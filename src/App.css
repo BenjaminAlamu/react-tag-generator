@@ -2,13 +2,13 @@
   text-align: center;
 }
 
-.loader{
-  
+.loader {
+  transform: translate(50%, 20vh);
 }
 
-.row {
+/* .row {
   margin: auto;
-}
+} */
 
 form {
   display: block;
@@ -22,7 +22,7 @@ input[type='text'] {
   height: auto;
   margin: auto;
   width: 60%;
-  font-family: "Montserrat";
+  font-family: 'Montserrat';
   display: block;
 }
 

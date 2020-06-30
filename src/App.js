@@ -5,7 +5,7 @@ import axios from 'axios'
 import ImageUploader from 'react-images-upload'
 import FileSaver from 'file-saver'
 
-function App() {
+function App () {
   const [state, setPageState] = useState({
     text: '',
     file: null,
@@ -14,7 +14,7 @@ function App() {
     url: '',
     image_id: '',
     name: '',
-    loading: false,
+    loading: false
   })
 
   // handle change in name value
@@ -56,11 +56,11 @@ function App() {
           setPageState({ ...state, error: 'An error occured please try again' })
         })
     } else if (!pictures.length > 0) {
+      setPageState({ ...state, loading: false })
       setPageState({ ...state, error: 'Please select an image' })
-      setPageState({ ...state, loading: false })
     } else if (!name.length > 0) {
-      setPageState({ ...state, error: 'Please enter your name' })
       setPageState({ ...state, loading: false })
+      setPageState({ ...state, error: 'Please enter your name' })
     }
   }
 
@@ -74,7 +74,7 @@ function App() {
       .then((response) => {
         console.log(response)
         console.log(response.config.url)
-        setPageState({ url: response.data })
+        setPageState({ ...state, url: response.data })
         FileSaver.saveAs(response.config.url, `${name}.jpg`)
         setPageState({ ...state, loading: false })
       })
@@ -88,6 +88,7 @@ function App() {
   let load
   loading
     ? (load = (
+      <div className='loader'>
         <Loader
           type='ThreeDots'
           color='#00BFFF'
@@ -95,7 +96,8 @@ function App() {
           width='100'
           className='loader'
         />
-      ))
+      </div>
+    ))
     : (load = '')
   return (
     <div className='App'>
